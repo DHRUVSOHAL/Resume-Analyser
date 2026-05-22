@@ -18,6 +18,7 @@ export const Login = () => {
 
     try {
       await handleLogin({ email, password });
+      
 
       navigate("/");
     } catch (error) {
