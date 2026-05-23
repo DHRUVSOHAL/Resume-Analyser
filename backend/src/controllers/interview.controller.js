@@ -3,6 +3,7 @@ const pdfParse = require("pdf-parse");
 const { generateInterviewReport } = require("../services/ai.service.js");
 
 const InterviewReportModel = require("../models/interviewReport.model.js");
+const { findOneAndUpdate } = require("../models/blackList.model.js");
 
 async function generateInterviewReportController(req, res) {
 
@@ -59,6 +60,54 @@ async function generateInterviewReportController(req, res) {
     }
 }
 
+/**
+ * @description get interview report by interviewId
+ * @access private
+ */
+async function generateInterviewReportByIdController(req,res){
+    const {interviewId}=req.param
+    const interviewReport=await InterviewReportModel.findOne({_id:interviewId,user:req.user.id})
+
+    if(!interviewReport){
+        return res.status(404).json({
+            message:"Interview Report not found"
+        })
+    }
+    else{
+        res.status(200).json({
+            message:"Interview report fetched successfully",
+            interviewReport
+        })
+    }
+}
+/**
+ * @description controlller to get all interview of logged in user
+ * 
+ */
+async function generateAllInterviewReportController(req, res) {
+    try {
+
+        const interviewReports = await InterviewReportModel
+            .find({ user: req.user.id })
+            .sort({ createdAt: -1 })
+            .select(
+                "-resume -selfDescription -jobDescription -__v -technicalQuestions -behavioralQuestions -skillGaps -preparationPlan"
+            );
+
+        res.status(200).json({
+            message: "Interview reports fetched successfully",
+            interviewReports
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            message: "Server Error",
+            error: error.message
+        });
+    }
+}
 module.exports = {
-    generateInterviewReportController
+    generateInterviewReportController,
+    generateInterviewReportByIdController,
+    generateAllInterviewReportController
 };

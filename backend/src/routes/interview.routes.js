@@ -14,5 +14,21 @@ const interviewController=require("../controllers/interview.controller.js")
  */
 
 interviewRouter.post("/",authMiddleware.authUser,upload.single("resume"),interviewController.generateInterviewReportController)
+/**
+ * @route GET /api/interview/:interviewId
+ * @description get interview report by interviewId
+ * @access private
+ */
+
+interviewRouter.get('/report/:interviewId',authMiddleware.authUser,interviewController.generateInterviewReportByIdController)
+
+/**
+ * @route get /api/interview/
+ * @description get all reports of logged in user
+ * @access private
+ */
+
+
+interviewRouter.get('/',authMiddleware.authUser,interviewController.generateAllInterviewReportController)
 
 module.exports=interviewRouter

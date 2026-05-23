@@ -37,7 +37,8 @@ const interviewReportSchema = z.object({
             focus: z.string(),
             tasks: z.array(z.string())
         })
-    )
+    ),
+    title:z.string().describe("The title of the job for which the interview report is generated")
 });
 
 async function generateInterviewReport({
@@ -60,6 +61,7 @@ Do not add extra fields.
 Return EXACTLY this structure:
 
 {
+"title": string,
   "matchScore": number,
 
   "technicalQuestions": [
