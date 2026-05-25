@@ -7,7 +7,7 @@ const app = express()
 app.use(express.json())
 app.use(cookieParser())
 app.use(cors({
-    origin: "https://resume-analyser-1-lfpa.onrender.com",
+    origin: "https://resume-analyser-frontend-12uo.onrender.com",
     credentials: true
 }))
 
