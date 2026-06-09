@@ -95,14 +95,15 @@ ${jobDescription}
 
     try {
 
-        const response = await ai.models.generateContent({
-            model: "gemini-2.5-flash",
-            contents: prompt
-        })
-
+        const response = await generateWithRetry(() =>
+            ai.models.generateContent({
+                model: "gemini-2.5-flash",
+                contents: prompt
+            })
+        );
         let text = response.text
 
-        
+
 
         if (!text) {
             throw new Error("Empty AI response")
@@ -177,14 +178,16 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
                         The resume should not be so lengthy, it should ideally be 1-2 pages long when converted to PDF. Focus on quality rather than quantity and make sure to include all the relevant information that can increase the candidate's chances of getting an interview call for the given job description.
                     `
 
-    const response = await ai.models.generateContent({
-        model: "gemini-2.5-flash",
-        contents: prompt,
-        config: {
-            responseMimeType: "application/json",
-            responseSchema: zodToJsonSchema(resumePdfSchema),
-        }
-    })
+    const response = await generateWithRetry(() =>
+        ai.models.generateContent({
+            model: "gemini-2.5-flash",
+            contents: prompt,
+            config: {
+                responseMimeType: "application/json",
+                responseSchema: zodToJsonSchema(resumePdfSchema),
+            }
+        })
+    );
 
 
     const jsonContent = JSON.parse(response.text)
@@ -193,6 +196,22 @@ async function generateResumePdf({ resume, selfDescription, jobDescription }) {
 
     return pdfBuffer
 
+}
+
+async function generateWithRetry(fn, retries = 3) {
+    for (let i = 0; i < retries; i++) {
+        try {
+            return await fn();
+        } catch (err) {
+            if (err.status !== 503 || i === retries - 1) {
+                throw err;
+            }
+
+            await new Promise(resolve =>
+                setTimeout(resolve, 2000 * (i + 1))
+            );
+        }
+    }
 }
 
 module.exports = { generateInterviewReport, generateResumePdf }
