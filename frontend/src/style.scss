@@ -18,3 +18,52 @@ body,
 .highlight{
     color: #d20d3b;
 }
+
+.navbar {
+    width: 100%;
+    height: 72px;
+    padding: 0 40px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    background: #ffffff;
+    border-bottom: 1px solid #e5e7eb;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    &__logo {
+        text-decoration: none;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2563eb;
+    }
+
+    &__actions {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+}
+
+.logout-btn {
+    border: none;
+    outline: none;
+    padding: 10px 22px;
+    border-radius: 10px;
+    cursor: pointer;
+
+    background: #ef4444;
+    color: white;
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    transition: all .2s ease;
+
+    &:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+    }
+}

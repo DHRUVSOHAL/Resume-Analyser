@@ -6,16 +6,18 @@ const Navbar = () => {
 
     return (
         <nav className="navbar">
-            <Link to="/" className="logo">
+            <Link to="/" className="navbar__logo">
                 Resume Analyzer
             </Link>
 
-            <button
-                className="logout-btn"
-                onClick={logout}
-            >
-                Logout
-            </button>
+            <div className="navbar__actions">
+                <button
+                    className="logout-btn"
+                    onClick={logout}
+                >
+                    Logout
+                </button>
+            </div>
         </nav>
     );
 };
