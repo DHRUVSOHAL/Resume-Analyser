@@ -2,6 +2,7 @@ import { getAllInterviewReports, generateInterviewReport, getInterviewReportById
 import { useContext, useEffect } from "react"
 import { InterviewContext } from "../interview.context"
 import { useParams } from "react-router"
+import { use } from "react"
 
 export const useInterview = () => {
 
@@ -141,6 +142,9 @@ export const useInterview = () => {
         }
 
     }, [interviewId])
+
+
+
 
     return {
         loading,

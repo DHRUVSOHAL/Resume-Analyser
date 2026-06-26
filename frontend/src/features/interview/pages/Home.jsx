@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router-dom'
+import Navbar from '...../components/Navbar.jsx'
 
 const Home = () => {
     const [resumeName, setResumeName] = useState("")
@@ -56,6 +57,7 @@ const Home = () => {
         <div className='home-page'>
 
             {/* Page Header */}
+             <Navbar />
             <header className='page-header'>
                 <h1>Create Your Custom <span className='highlight'>Interview Plan</span></h1>
                 <p>Let our AI analyze the job requirements and your unique profile to build a winning strategy.</p>

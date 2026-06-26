@@ -74,3 +74,8 @@ export const generateResumePdf = async ({ interviewReportId }) => {
 
     return response.data
 }
+export const logoutUser = async () => {
+    const response = await api.post("/api/auth/logout");
+
+    return response.data;
+};
