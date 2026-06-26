@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react'
 import "../style/home.scss"
 import { useInterview } from '../hooks/useInterview.js'
 import { useNavigate } from 'react-router-dom'
-import Navbar from '...../components/Navbar.jsx'
+import Navbar from "../../components/Navbar";
 
 const Home = () => {
     const [resumeName, setResumeName] = useState("")
