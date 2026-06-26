@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useAuth } from "../interview/hooks/useAuth";
+import "../../style/navbar.scss";
 
 const Navbar = () => {
     const { logout } = useAuth();
@@ -11,10 +12,7 @@ const Navbar = () => {
             </Link>
 
             <div className="navbar__actions">
-                <button
-                    className="logout-btn"
-                    onClick={logout}
-                >
+                <button className="logout-btn" onClick={logout}>
                     Logout
                 </button>
             </div>
