@@ -134,9 +134,10 @@ const Interview = () => {
                 : 'score--low'
 
     return (
+        <><Navbar/>
         <div className='interview-page'>
             
-            <Navbar/>
+            
             <div className='interview-layout'>
 
                 {/* Left Nav */}
@@ -241,6 +242,7 @@ const Interview = () => {
 
             </div>
         </div>
+        </>
     )
 }
 
