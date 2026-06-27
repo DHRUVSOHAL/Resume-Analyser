@@ -174,7 +174,7 @@ async function forgetPassword(req, res) {
 
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(440).json({ 
+            return res.status(440).json({
                 success: false,
                 message: "Khaata nahi mila! Pehle register karein."
             });
@@ -208,10 +208,9 @@ async function forgetPassword(req, res) {
         });
     }
 }
-
 async function verifyOtp(req, res) {
     try {
-        const { email, otp } = req.body; // Frontend ya Postman se plain OTP aur email aayega
+        const { email, otp } = req.body;
 
         if (!email || !otp) {
             return res.status(400).json({ success: false, message: "Email aur OTP dono zaroori hain!" });
@@ -221,9 +220,9 @@ async function verifyOtp(req, res) {
         const otpRecord = await otpModel.findOne({ email });
 
         if (!otpRecord) {
-            return res.status(400).json({ 
-                success: false, 
-                message: "OTP expire ho chuka hai ya galat email hai. Naya OTP request karein." 
+            return res.status(400).json({
+                success: false,
+                message: "OTP expire ho chuka hai ya galat email hai. Naya OTP request karein."
             });
         }
 
@@ -234,13 +233,36 @@ async function verifyOtp(req, res) {
             return res.status(400).json({ success: false, message: "Galat OTP hai! Kripya check karke dubara dalein." });
         }
 
-        // 3. OTP sahi hai! Isko reuse hone se rokne ke liye DB se delete kar do
+        // 3. 🔥 टोकन के लिए यूजर की Object ID निकालें
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(444).json({ success: false, message: "User nahi mila!" });
+        }
+
+        // 4. 🔥 Reset JWT Token जनरेट करें (सिर्फ 10 मिनट के लिए वैलिड)
+        // verifyOtp के अंदर जहाँ टोकन साइन हो रहा है:
+        const resetToken = jwt.sign(
+            {
+                id: user._id,
+                purpose: "reset-password" // 🔥 यहाँ हमने पर्पस सेट कर दिया
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '10m' }
+        );
+        res.cookie("resetToken", resetToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 10 * 60 * 1000 // 10 minutes only
+        });
+
+        // 5. OTP sahi hai! Isko reuse hone se rokne ke liye DB se delete kar do
         await otpModel.deleteOne({ _id: otpRecord._id });
 
-        // 4. Success Response: Yahan hum frontend ko batayenge ki verification done hai
-        return res.status(200).json({ 
-            success: true, 
-            message: "OTP verification safal raha! Ab aap aage badh sakte hain." 
+        // 6. Success Response में resetToken भेजें
+        return res.status(200).json({
+            success: true,
+            message: "OTP verification safal raha! Ab aap password badal sakte hain.",
         });
 
     } catch (error) {
@@ -249,11 +271,76 @@ async function verifyOtp(req, res) {
     }
 }
 
+
+/**
+ * @name resetPassword
+ * @description Reset user password after valid OTP token verification
+ * @access Protected (via verifyResetToken middleware)
+ */
+async function resetPassword(req, res) {
+    try {
+        const { newPassword } = req.body;
+
+        // 1. बेसिक वैलिडेशन
+        if (!newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Naya password dalna zaroori hai!"
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password kam se kam 6 characters ka hona chahiye."
+            });
+        }
+
+        // 2. मिडिलवेयर (verifyResetToken) से मिली ID के जरिए यूजर ढूंढें
+        const user = await userModel.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User nahi mila!"
+            });
+        }
+
+        // 3. नए पासवर्ड को हैश (Hash) करें
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // 4. DB में पासवर्ड अपडेट करें और सेव करें
+        user.password = hashedPassword;
+        await user.save();
+
+        // 5. 🔥 SECURITY STEP: काम खत्म होने के बाद ब्राउज़र से resetToken कुकी को डिलीट करें
+        res.clearCookie("resetToken", {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none"
+        });
+
+        // 6. सक्सेस रिस्पॉन्स भेजें
+        return res.status(200).json({
+            success: true,
+            message: "Password safaltapoorvak badal diya gaya hai! Ab aap login kar sakte hain."
+        });
+
+    } catch (error) {
+        console.error("Error in resetPassword:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message
+        });
+    }
+}
 module.exports = {
     registerUserController,
     loginUserController,
     logoutUserController,
     getMeController,
     forgetPassword,
-    verifyOtp
+    verifyOtp,
+    resetPassword
 }

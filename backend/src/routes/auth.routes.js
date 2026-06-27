@@ -51,4 +51,14 @@ authRouter.post("/forget-password",authController.forgetPassword)
  */
 
 authRouter.post("/verify-otp",authController.verifyOtp)
+
+/**
+ * @route POST /api/auth/change-password
+ * @description first check reset token then reset password
+ * @access private
+ */
+
+authRouter.post("/reset-password",authMiddleware.verifyResetToken,authController.resetPassword)
+
+
 module.exports = authRouter
