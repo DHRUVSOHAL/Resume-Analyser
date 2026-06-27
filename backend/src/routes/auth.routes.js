@@ -36,4 +36,19 @@ authRouter.post("/logout", authController.logoutUserController)
 authRouter.get("/get-me", authMiddleware.authUser, authController.getMeController)
 
 
+
+/**
+ * @route POST /api/auth/forget-password
+ * @description  it will take email as input and send otp and match
+ * @access private
+ */
+
+authRouter.post("/forget-password",authController.forgetPassword)
+/**
+ * @route POST /api/auth/verify-otp
+ * @description it will take otp and email 
+ * @access private
+ */
+
+authRouter.post("/verify-otp",authController.verifyOtp)
 module.exports = authRouter
