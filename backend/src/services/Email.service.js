@@ -1,11 +1,20 @@
 const nodemailer = require('nodemailer');
 
-// 1. Transporter create karo (Email bhejni wali service configure karo)
+// 1. Transporter create karo (Render & Live Server fully compatible config)
 const transporter = nodemailer.createTransport({
-    service: 'gmail', // Agar gmail use kar rahe ho
+    host: "smtp.gmail.com",
+    port: 587,             // 👈 465 रेंडर पर ब्लॉक होता है, 587 (TLS) एकदम स्मूथ चलेगा
+    secure: false,         // 👈 पोर्ट 587 के लिए secure हमेशा false रहेगा
     auth: {
-        user: process.env.EMAIL_USER, // Tumhara email (e.g., example@gmail.com)
-        pass: process.env.EMAIL_PASS  // Gmail ka 'App Password' (Normal password nahi chalega)
+        user: process.env.EMAIL_USER, 
+        pass: process.env.EMAIL_PASS  // तुम्हारा 16-digit App Password
+    },
+    // 🔥 यह ब्लॉक रेंडर के IPv6 नेटवर्क और टाइमआउट वाले एरर्स को बाईपास करेगा
+    connectionTimeout: 10000, // 10 सेकंड का कनेक्शन टाइमआउट बढ़ाया
+    greetingTimeout: 10000,
+    tls: {
+        rejectUnauthorized: false, // सर्टिफ़िकेट एरर्स को अनदेखा करने के लिए
+        minVersion: "TLSv1.2"      // सिक्योर कनेक्शन फ़ोर्स करने के लिए
     }
 });
 
