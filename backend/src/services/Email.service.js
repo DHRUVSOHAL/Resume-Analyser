@@ -46,6 +46,7 @@ async function sendOTPEmail(toEmail, otp) {
         console.log(`📨 Email successfully sent to ${toEmail}: ${info.messageId}`);
         return true;
     } catch (error) {
+        console.log("email bhejne me error aya")
         console.error("❌ Nodemailer Error:", error);
         throw new Error("Email bhejne mein dikkat aayi");
     }
