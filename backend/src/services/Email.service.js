@@ -13,7 +13,7 @@ const transporter = nodemailer.createTransport({
 async function sendOTPEmail(toEmail, otp) {
     try {
         const mailOptions = {
-            from: `"Your App Name" <${process.env.EMAIL_USER}>`,
+            from: `"Resume Analyser" <${process.env.EMAIL_USER}>`,
             to: toEmail,
             subject: '🔒 Reset Your Password - OTP Verification',
             html: `

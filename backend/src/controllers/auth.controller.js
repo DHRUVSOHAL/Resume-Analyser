@@ -277,6 +277,7 @@ async function verifyOtp(req, res) {
  * @description Reset user password after valid OTP token verification
  * @access Protected (via verifyResetToken middleware)
  */
+
 async function resetPassword(req, res) {
     try {
         const { newPassword } = req.body;
@@ -320,10 +321,34 @@ async function resetPassword(req, res) {
             sameSite: "none"
         });
 
-        // 6. सक्सेस रिस्पॉन्स भेजें
+        // ==========================================
+        // 🚀 NEW AUTO-LOGIN LOGIC
+        // ==========================================
+        
+        // 6. तुरंत नया Auth Token जेनरेट करें (जैसा लॉगिन में किया था)
+        const token = jwt.sign(
+            { id: user._id, username: user.username },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+
+        // 7. इस नए Auth Token को कुकी में सेट करें
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: "none",
+            maxAge: 24 * 60 * 60 * 1000 // 1 din
+        });
+
+        // 8. सक्सेस रिस्पॉन्स के साथ यूजर डेटा भी भेजें ताकि फ्रंटएंड स्टेट अपडेट कर सके
         return res.status(200).json({
             success: true,
-            message: "Password safaltapoorvak badal diya gaya hai! Ab aap login kar sakte hain."
+            message: "Password badal gaya hai aur aap login ho chuke hain!",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
         });
 
     } catch (error) {

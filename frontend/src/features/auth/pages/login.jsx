@@ -42,6 +42,7 @@ const Login = () => {
                     <button className='button primary-button' >Login</button>
                 </form>
                 <p>Don't have an account? <Link to={"/register"} >Register</Link> </p>
+                <p>Forget password?<Link to ={"/forgetPassword"}>Forget</Link></p>
             </div>
         </main>
     )
