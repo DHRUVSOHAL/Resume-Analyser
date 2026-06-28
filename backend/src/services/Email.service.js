@@ -1,20 +1,21 @@
 const nodemailer = require('nodemailer');
 
-// 1. Transporter create karo (Render & Live Server fully compatible config)
+// 1. Transporter create karo (Forced IPv4 Config)
 const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,             // 👈 465 रेंडर पर ब्लॉक होता है, 587 (TLS) एकदम स्मूथ चलेगा
-    secure: false,         // 👈 पोर्ट 587 के लिए secure हमेशा false रहेगा
+    // 💡 smtp.gmail.com का डायरेक्ट और स्टेबल IPv4 एड्रेस डाल दिया है
+    host: "74.125.143.108", 
+    port: 465,               // IPv4 एड्रेस के साथ पोर्ट 465 (SSL) एकदम रॉकेट चलेगा
+    secure: true,            // पोर्ट 465 के लिए secure हमेशा TRUE होगा
     auth: {
         user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS  // तुम्हारा 16-digit App Password
     },
-    // 🔥 यह ब्लॉक रेंडर के IPv6 नेटवर्क और टाइमआउट वाले एरर्स को बाईपास करेगा
-    connectionTimeout: 10000, // 10 सेकंड का कनेक्शन टाइमआउट बढ़ाया
-    greetingTimeout: 10000,
+    // कनेक्शन को और मजबूत करने के लिए टाइमआउट्स
+    connectionTimeout: 15000, 
+    greetingTimeout: 15000,
     tls: {
-        rejectUnauthorized: false, // सर्टिफ़िकेट एरर्स को अनदेखा करने के लिए
-        minVersion: "TLSv1.2"      // सिक्योर कनेक्शन फ़ोर्स करने के लिए
+        rejectUnauthorized: false,
+        servername: "smtp.gmail.com" // 👈 यह बहुत ज़रूरी है ताकि गूगल का सर्टिफिकेट मैच हो जाए
     }
 });
 
