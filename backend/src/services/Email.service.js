@@ -42,7 +42,8 @@ async function sendOTPEmail(toEmail, otp) {
                 </div>
             `
         };
-
+        console.log(process.env.EMAIL_USER);
+console.log(process.env.EMAIL_PASS ? "PASS OK" : "PASS MISSING");
         const info = await transporter.sendMail(mailOptions);
         console.log(`📨 Email successfully sent to ${toEmail}: ${info.messageId}`);
         return true;
