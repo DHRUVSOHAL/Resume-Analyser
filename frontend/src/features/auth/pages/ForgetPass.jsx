@@ -2,15 +2,14 @@ import React from 'react';
 import EmailStep from '../components/EmailStep';
 import OtpStep from '../components/OtpStep';
 import PasswordStep from '../components/PasswordStep';
-import {ResetPass} from '../hooks/ResetPass'
+import { ResetPass } from '../hooks/ResetPass';
 
-const ForgetPass= () => {
+const ForgetPass = () => {
   const {
     step, email, setEmail, otp, setOtp, newPassword, setNewPassword, error,
     handleSendOtp, handleVerifyOtp, handleResetPassword
   } = ResetPass();
 
-  // स्टेप्स के नाम (प्रोग्रेस बार के लिए)
   const stepsConfig = [
     { id: 1, label: 'Email' },
     { id: 2, label: 'OTP' },
@@ -18,80 +17,142 @@ const ForgetPass= () => {
   ];
 
   return (
-    <div style={{ maxWidth: '400px', margin: '50px auto', padding: '20px', border: '1px solid #ccc', backgroundColor: '#fff', borderRadius: '8px', boxShadow: '0 4px 6px rgba(0,0,0,0.1)' }}>
-      <h2 style={{ textAlign: 'center', marginBottom: '20px', color: '#333' }}>Reset Password</h2>
-      
-      {/* 📊 STEP INDICATOR (PROGRESS BAR) */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '30px', position: 'relative' }}>
-        {stepsConfig.map((s, index) => (
-          <div key={s.id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, position: 'relative', zIndex: 2 }}>
-            {/* गोला (Circle) */}
-            <div style={{
-              width: '30px',
-              height: '30px',
-              borderRadius: '50%',
-              backgroundColor: step >= s.id ? '#007bff' : '#ccc',
-              color: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontWeight: 'bold',
-              transition: 'background-color 0.3s ease'
-            }}>
-              {s.id}
-            </div>
-            {/* लेबल (Label) */}
-            <span style={{ fontSize: '12px', marginTop: '5px', color: step >= s.id ? '#007bff' : '#666', fontWeight: step === s.id ? 'bold' : 'normal' }}>
-              {s.label}
-            </span>
-          </div>
-        ))}
-        
-        {/* बैकग्राउंड प्रोग्रेस लाइन */}
-        <div style={{
-          position: 'absolute',
-          top: '15px',
-          left: '15px',
-          right: '15px',
-          height: '2px',
-          backgroundColor: '#ccc',
-          zIndex: 1
-        }} />
-        
-        {/* एक्टिव प्रोग्रेस लाइन */}
-        <div style={{
-          position: 'absolute',
-          top: '15px',
-          left: '15px',
-          width: step === 1 ? '0%' : step === 2 ? '50%' : '100%',
-          height: '2px',
-          backgroundColor: '#007bff',
-          zIndex: 1,
-          transition: 'width 0.3s ease'
-        }} />
-      </div>
+    <div style={styles.container}>
+      <div style={styles.card}>
+        <h2 style={styles.title}>Forgot Password</h2>
+        <p style={styles.subtitle}>Reset your password in 3 simple steps</p>
 
-      {/* ─── ERROR MESSAGE ─── */}
-      {error && (
-        <div style={{ color: 'red', backgroundColor: '#ffe6e6', padding: '10px', borderRadius: '4px', marginBottom: '15px', fontSize: '14px', border: '1px solid #ffa3a3' }}>
-          {error}
+        {/* Progress Bar UI */}
+        <div style={styles.progressContainer}>
+          {stepsConfig.map((s, index) => (
+            <React.Fragment key={s.id}>
+              <div style={styles.stepWrapper}>
+                <div style={{
+                  ...styles.stepCircle,
+                  backgroundColor: step >= s.id ? '#4F46E5' : '#E5E7EB',
+                  color: step >= s.id ? '#FFFFFF' : '#6B7280'
+                }}>
+                  {s.id}
+                </div>
+                <span style={{
+                  ...styles.stepLabel,
+                  color: step >= s.id ? '#4F46E5' : '#9CA3AF',
+                  fontWeight: step === s.id ? '600' : '400'
+                }}>{s.label}</span>
+              </div>
+              {index < stepsConfig.length - 1 && (
+                <div style={{
+                  ...styles.stepLine,
+                  backgroundColor: step > s.id ? '#4F46E5' : '#E5E7EB'
+                }} />
+              )}
+            </React.Fragment>
+          ))}
         </div>
-      )}
-      
-      {/* ─── STEP BASED RENDERING ─── */}
-      {step === 1 && (
-        <EmailStep email={email} setEmail={setEmail} onSubmit={handleSendOtp} />
-      )}
 
-      {step === 2 && (
-        <OtpStep otp={otp} setOtp={setOtp} onSubmit={handleVerifyOtp} />
-      )}
+        {/* Error Alert */}
+        {error && <div style={styles.errorAlert}>{error}</div>}
 
-      {step === 3 && (
-        <PasswordStep newPassword={newPassword} setNewPassword={setNewPassword} onSubmit={handleResetPassword} />
-      )}
+        {/* Form Steps Switching */}
+        <div style={styles.formContent}>
+          {step === 1 && (
+            <EmailStep email={email} setEmail={setEmail} onSubmit={handleSendOtp} />
+          )}
+          {step === 2 && (
+            <OtpStep otp={otp} setOtp={setOtp} onSubmit={handleVerifyOtp} />
+          )}
+          {step === 3 && (
+            <PasswordStep newPassword={newPassword} setNewPassword={setNewPassword} onSubmit={handleResetPassword} />
+          )}
+        </div>
+      </div>
     </div>
   );
+};
+
+// Modern UI Styles
+const styles = {
+  container: {
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    minHeight: '100vh',
+    backgroundColor: '#F3F4F6',
+    fontFamily: 'Segoe UI, Tahoma, Geneva, Verdana, sans-serif',
+    padding: '20px'
+  },
+  card: {
+    backgroundColor: '#FFFFFF',
+    padding: '40px 32px',
+    borderRadius: '16px',
+    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+    width: '100%',
+    maxWidth: '440px',
+    boxSizing: 'border-box'
+  },
+  title: {
+    fontSize: '24px',
+    fontWeight: '700',
+    color: '#1F2937',
+    textAlign: 'center',
+    margin: '0 0 8px 0'
+  },
+  subtitle: {
+    fontSize: '14px',
+    color: '#6B7280',
+    textAlign: 'center',
+    margin: '0 0 30px 0'
+  },
+  progressContainer: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '35px',
+    position: 'relative'
+  },
+  stepWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    zIndex: 2
+  },
+  stepCircle: {
+    width: '32px',
+    height: '32px',
+    borderRadius: '50%',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontSize: '14px',
+    fontWeight: '600',
+    transition: 'all 0.3s ease'
+  },
+  stepLabel: {
+    fontSize: '12px',
+    marginTop: '6px',
+    transition: 'all 0.3s ease'
+  },
+  stepLine: {
+    height: '2px',
+    flex: 1,
+    margin: '0 -10px',
+    marginBottom: '20px',
+    transition: 'all 0.3s ease',
+    zIndex: 1
+  },
+  errorAlert: {
+    backgroundColor: '#FEE2E2',
+    color: '#DC2626',
+    padding: '12px',
+    borderRadius: '8px',
+    fontSize: '14px',
+    marginBottom: '20px',
+    textAlign: 'center',
+    border: '1px solid #FCA5A5'
+  },
+  formContent: {
+    marginTop: '10px'
+  }
 };
 
 export default ForgetPass;

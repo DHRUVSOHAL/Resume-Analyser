@@ -1,16 +1,19 @@
 import React from 'react';
 
 const EmailStep = ({ email, setEmail, onSubmit }) => (
-  <form onSubmit={onSubmit} style={{ marginBottom: '15px' }}>
-    <label>Email Address:</label>
+  <form onSubmit={onSubmit} style={{ display: 'flex', flexDirection: 'column' }}>
+    <label style={inputStyles.label}>Email Address</label>
     <input 
       type="email" 
+      placeholder="you@example.com"
       value={email} 
       onChange={(e) => setEmail(e.target.value)} 
       required 
-      style={{ width: '100%', padding: '8px', marginTop: '5px' }}
+      style={inputStyles.input}
     />
-    <button type="submit" style={{ marginTop: '10px' }}>Send OTP</button>
+    <button type="submit" style={inputStyles.button}>
+      Send OTP
+    </button>
   </form>
 );
 

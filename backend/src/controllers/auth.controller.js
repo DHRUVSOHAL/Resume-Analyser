@@ -188,12 +188,12 @@ async function forgetPassword(req, res) {
             otp: hash
         });
 
-        // 6. Abhi ke liye terminal mein print kar rahe hain testing ke liye
+       
         console.log(`\n📩 [TESTING] OTP sent to ${email} -> PLAIN OTP: ${plainOTP}\n`);
 
-        // TODO: Yahan Nodemailer ka mail function call hoga jisme plainOTP jayega
+        
         await sendOTPEmail(email, plainOTP);
-        // 7. Success response return karna mat bhoolna!
+        
         return res.status(200).json({
             success: true,
             message: "OTP aapke email par bhej diya gaya hai."
@@ -216,7 +216,7 @@ async function verifyOtp(req, res) {
             return res.status(400).json({ success: false, message: "Email aur OTP dono zaroori hain!" });
         }
 
-        // 1. DB se is email ka latest OTP record find karo
+       
         const otpRecord = await otpModel.findOne({ email });
 
         if (!otpRecord) {
@@ -226,25 +226,23 @@ async function verifyOtp(req, res) {
             });
         }
 
-        // 2. Plain OTP ko DB wale hashed OTP se compare karo
         const isMatch = await bcrypt.compare(otp, otpRecord.otp);
 
         if (!isMatch) {
             return res.status(400).json({ success: false, message: "Galat OTP hai! Kripya check karke dubara dalein." });
         }
 
-        // 3. 🔥 टोकन के लिए यूजर की Object ID निकालें
+        
         const user = await userModel.findOne({ email });
         if (!user) {
             return res.status(444).json({ success: false, message: "User nahi mila!" });
         }
 
-        // 4. 🔥 Reset JWT Token जनरेट करें (सिर्फ 10 मिनट के लिए वैलिड)
-        // verifyOtp के अंदर जहाँ टोकन साइन हो रहा है:
+    
         const resetToken = jwt.sign(
             {
                 id: user._id,
-                purpose: "reset-password" // 🔥 यहाँ हमने पर्पस सेट कर दिया
+                purpose: "reset-password" 
             },
             process.env.JWT_SECRET,
             { expiresIn: '10m' }
@@ -253,13 +251,11 @@ async function verifyOtp(req, res) {
             httpOnly: true,
             secure: true,
             sameSite: "none",
-            maxAge: 10 * 60 * 1000 // 10 minutes only
+            maxAge: 10 * 60 * 1000 
         });
 
-        // 5. OTP sahi hai! Isko reuse hone se rokne ke liye DB se delete kar do
         await otpModel.deleteOne({ _id: otpRecord._id });
 
-        // 6. Success Response में resetToken भेजें
         return res.status(200).json({
             success: true,
             message: "OTP verification safal raha! Ab aap password badal sakte hain.",
@@ -282,7 +278,6 @@ async function resetPassword(req, res) {
     try {
         const { newPassword } = req.body;
 
-        // 1. बेसिक वैलिडेशन
         if (!newPassword) {
             return res.status(400).json({
                 success: false,
@@ -297,7 +292,6 @@ async function resetPassword(req, res) {
             });
         }
 
-        // 2. मिडिलवेयर (verifyResetToken) से मिली ID के जरिए यूजर ढूंढें
         const user = await userModel.findById(req.user.id);
         if (!user) {
             return res.status(404).json({
@@ -306,33 +300,25 @@ async function resetPassword(req, res) {
             });
         }
 
-        // 3. नए पासवर्ड को हैश (Hash) करें
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
 
-        // 4. DB में पासवर्ड अपडेट करें और सेव करें
+        
         user.password = hashedPassword;
         await user.save();
 
-        // 5. 🔥 SECURITY STEP: काम खत्म होने के बाद ब्राउज़र से resetToken कुकी को डिलीट करें
         res.clearCookie("resetToken", {
             httpOnly: true,
             secure: true,
             sameSite: "none"
         });
 
-        // ==========================================
-        // 🚀 NEW AUTO-LOGIN LOGIC
-        // ==========================================
-        
-        // 6. तुरंत नया Auth Token जेनरेट करें (जैसा लॉगिन में किया था)
         const token = jwt.sign(
             { id: user._id, username: user.username },
             process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
 
-        // 7. इस नए Auth Token को कुकी में सेट करें
         res.cookie("token", token, {
             httpOnly: true,
             secure: true,
@@ -340,7 +326,6 @@ async function resetPassword(req, res) {
             maxAge: 24 * 60 * 60 * 1000 // 1 din
         });
 
-        // 8. सक्सेस रिस्पॉन्स के साथ यूजर डेटा भी भेजें ताकि फ्रंटएंड स्टेट अपडेट कर सके
         return res.status(200).json({
             success: true,
             message: "Password badal gaya hai aur aap login ho chuke hain!",

@@ -6,11 +6,12 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 async function sendOTPEmail(toEmail, otp) {
     try {
         const data = await resend.emails.send({
-            from: 'onboarding@resend.dev', // Shuru mein testing ke liye yeh use karo, baad mein apna domain add kar sakte ho
+            from: 'onboarding@resend.dev', 
             to: toEmail,
             subject: '🔒 Reset Your Password - OTP Verification',
             html: `
-                <h2>Password Reset</h2>
+                <h1>Resume Analyser</h1>
+                <h2>Password Reset </h2>
                 <p>Your OTP is:</p>
                 <h1>${otp}</h1>
                 <p>Valid for 10 minutes.</p>
